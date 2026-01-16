@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <div class="box"></div>
+  <div class="box2"></div>
+  <div id="app">
+    {{msg}}//插值表达式
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.7.16/dist/vue.js"></script>
+
+  <!-- 创建实例 -->
+  <script>
+    // 一旦引入了vueJS核心包，在全局环境中就有了vue构造函数，可以创建一个vue的实例
+    const app = new Vue({
+      el: '#app',//el配置选择器，指定vue管理的是哪个组件
+      data: {//data传递数据
+        msg: 'ee'
+      },
+    })
+
+  </script>
+
+</body>
+
+</html>
