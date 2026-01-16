@@ -1,135 +1,246 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
-    <!-- CSS only -->
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
-    />
-    <style>
-      .red {
-        color: red!important;
-      }
-      .search {
-        width: 300px;
-        margin: 20px 0;
-      }
-      .my-form {
-        display: flex;
-        margin: 20px 0;
-      }
-      .my-form input {
-        flex: 1;
-        margin-right: 20px;
-      }
-      .table > :not(:first-child) {
-        border-top: none;
-      }
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Document</title>
+  <!-- CSS only -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" />
+  <style>
+    .red {
+      color: red !important;
+    }
+
+    .search {
+      width: 300px;
+      margin: 20px 0;
+    }
+
+    .my-form {
+      display: flex;
+      margin: 20px 0;
+    }
+
+    .my-form input {
+      flex: 1;
+      margin-right: 20px;
+    }
+
+    .table> :not(:first-child) {
+      border-top: none;
+    }
+
+    .contain {
+      display: flex;
+      padding: 10px;
+    }
+
+    .list-box {
+      flex: 1;
+      padding: 0 30px;
+    }
+
+    .list-box a {
+      text-decoration: none;
+    }
+
+    .echarts-box {
+      width: 600px;
+      height: 400px;
+      padding: 30px;
+      margin: 0 auto;
+      border: 1px solid #ccc;
+    }
+
+    tfoot {
+      font-weight: bold;
+    }
+
+    @media screen and (max-width: 1000px) {
       .contain {
-        display: flex;
-        padding: 10px;
+        flex-wrap: wrap;
       }
+
       .list-box {
-        flex: 1;
-        padding: 0 30px;
+        width: 100%;
       }
-      .list-box  a {
-        text-decoration: none;
-      }
+
       .echarts-box {
-        width: 600px;
-        height: 400px;
-        padding: 30px;
-        margin: 0 auto;
-        border: 1px solid #ccc;
+        margin-top: 30px;
       }
-      tfoot {
-        font-weight: bold;
-      }
-      @media screen and (max-width: 1000px) {
-        .contain {
-          flex-wrap: wrap;
-        }
-        .list-box {
-          width: 100%;
-        }
-        .echarts-box {
-          margin-top: 30px;
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <div id="app">
-      <div class="contain">
-        <!-- 左侧列表 -->
-        <div class="list-box">
+    }
+  </style>
+</head>
 
-          <!-- 添加资产 -->
-          <form class="my-form">
-            <input type="text" class="form-control" placeholder="消费名称" />
-            <input type="text" class="form-control" placeholder="消费价格" />
-            <button type="button" class="btn btn-primary">添加账单</button>
-          </form>
+<body>
+  <div id="app">
+    <div class="contain">
+      <!-- 左侧列表 -->
+      <div class="list-box">
 
-          <table class="table table-hover">
-            <thead>
-              <tr>
-                <th>编号</th>
-                <th>消费名称</th>
-                <th>消费价格</th>
-                <th>操作</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>1</td>
-                <td>帽子</td>
-                <td>99.00</td>
-                <td><a href="javascript:;">删除</a></td>
-              </tr>
-              <tr>
-                <td>2</td>
-                <td>大衣</td>
-                <td class="red">199.00</td>
-                <td><a href="javascript:;">删除</a></td>
-              </tr>
-            </tbody>
-            <tfoot>
-              <tr>
-                <td colspan="4">消费总计： 298.00</td>
-              </tr>
-            </tfoot>
-          </table>
-        </div>
-        
-        <!-- 右侧图表 -->
-        <div class="echarts-box" id="main"></div>
+        <!-- 添加资产 -->
+        <form class="my-form">
+          <input type="text" class="form-control" placeholder="消费名称" v-model.trim="name" />
+          <input type="text" class="form-control" placeholder="消费价格" v-model.number="price" />
+          <button type="button" class="btn btn-primary" @click="add">添加账单</button>
+        </form>
+
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>编号</th>
+              <th>消费名称</th>
+              <th>消费价格</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(item,index) in list" :key="item.id">
+              <td>{{index+1}}</td>
+              <td>{{item.name}}</td>
+              <td>{{item.price}}</td>
+              <td><a href="javascript:;" @click="del(item.id)">删除</a></td>
+            </tr>
+          <tfoot>
+            <tr>
+              <td colspan="4">消费总计：{{totalPrice}}</td>
+            </tr>
+          </tfoot>
+        </table>
       </div>
+
+      <!-- 右侧图表 -->
+      <div class="echarts-box" id="main"></div>
     </div>
-    <script src="../echarts.min.js"></script>
-    <script src="../vue.js"></script>
-    <script src="../axios.js"></script>
-    <script>
-      /**
-       * 接口文档地址：
-       * https://www.apifox.cn/apidoc/shared-24459455-ebb1-4fdc-8df8-0aff8dc317a8/api-53371058
-       * 
-       * 功能需求：
-       * 1. 基本渲染
-       * 2. 添加功能
-       * 3. 删除功能
-       * 4. 饼图渲染
-       */
-      const app = new Vue({
-        el: '#app',
-        data: {
-          
+  </div>
+  <script src="../echarts.min.js"></script>
+  <script src="../vue.js"></script>
+  <script src="../axios.js"></script>
+  <script>
+    /**
+     * 接口文档地址：
+     * https://www.apifox.cn/apidoc/shared-24459455-ebb1-4fdc-8df8-0aff8dc317a8/api-53371058
+     * 
+     * 功能需求：
+     * 1. 基本渲染
+     * (1)发送请求获取数据
+     * (2)存数据
+     * (3)渲染
+     * (4)计算属性做统计
+     * 2. 添加功能
+     * (1)删除数据
+     * (2)新增账单
+     * 3. 饼图渲染
+     *(1)初始化饼图（mounted
+     *(2)更新饼图
+     * */
+    const INIT_LIST = [
+      { id: 1, name: '早餐', price: 12 },
+      { id: 2, name: '奶茶', price: 18 },
+      { id: 3, name: '地铁', price: 5 }
+    ]
+    const app = new Vue({
+      el: '#app',
+      data: {
+        list: [],
+        name: '',
+        price: '',
+        myChart: null
+      },
+      methods: {
+        add(name, price) {
+          this.list.unshift({
+            id: +new Date(),
+            name: this.name,
+            price: this.price
+          })
+          localStorage.setItem('bill-list', JSON.stringify(this.list))
+
+          this.name = ''
+          this.price = ''
+
+          this.updateChart()
         },
-      })
-    </script>
-  </body>
+
+        del(id) {
+          this.list = this.list.filter(item => item.id !== id)
+          localStorage.setItem('bill-list', JSON.stringify(this.list))
+
+          this.updateChart()
+        },
+        updateChart() {
+          if (!this.myChart) return
+
+          this.myChart.setOption({
+            series: [
+              {
+                data: this.list.map(item => ({
+                  value: item.price,
+                  name: item.name
+                }))
+              }
+            ]
+          })
+        },
+      },
+
+      computed: {
+        totalPrice() {
+          return this.list.reduce((sum, item) => sum + item.price, 0)
+        }
+      },
+
+      created() {
+        const key = 'bill-list'
+
+        // 第一次进来：localStorage 没数据
+        if (!localStorage.getItem(key)) {
+          localStorage.setItem(key, JSON.stringify(INIT_LIST))
+        }
+
+        // 读取数据
+        this.list = JSON.parse(localStorage.getItem(key))
+      },
+
+      mounted() {
+        this.myChart = echarts.init(document.querySelector('#main'))
+        this.myChart.setOption({
+          title: {
+            text: '小黑记账本',
+            subtext: 'bill data',
+            left: 'center'
+          },
+          tooltip: {
+            trigger: 'item'
+          },
+          legend: {
+            orient: 'vertical',
+            left: 'left'
+          },
+          series: [
+            {
+              name: 'Access From',
+              type: 'pie',
+              radius: '50%',
+              data: [],
+              emphasis: {
+                itemStyle: {
+                  shadowBlur: 10,
+                  shadowOffsetX: 0,
+                  shadowColor: 'rgba(0, 0, 0, 0.5)'
+                }
+              }
+            }
+          ]
+        })
+        this.updateChart()
+      },
+
+
+
+    })
+  </script>
+</body>
+
 </html>
