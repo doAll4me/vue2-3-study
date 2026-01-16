@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+
+  <div id="app">
+    <h3>{{ title }}</h3>
+    <div>
+      <button @click="count--">-</button>
+      <span>{{ count }}</span>
+      <button @click="count++">+</button>
+    </div>
+  </div>
+  <script src="./vue.js"></script>
+  <script>
+    const app = new Vue({
+      el: '#app',
+      data: {
+        count: 100,
+        title: '计数器'
+      },
+      // 1.创建阶段 （准备数据）
+      beforeCreate() {
+        // 创建前count是undefined
+        console.log('beforCreate 响应式数据准备好之前', this.count);
+      },
+      created() {
+        console.log('beforCreate 响应式数据准备好之后', this.count);
+        // 已创建数据
+        // 可以开始发送初始化渲染请求
+      },
+
+      // 2.挂载阶段 
+      beforeMount() {
+        // 返回的只是代码模版语法，还没被解析渲染
+        console.log('beforeMount 模版渲染前', document.querySelector('h3').innerHTML);
+      },
+      mounted() {
+        console.log('mounted 模版渲染之后', document.querySelector('h3').innerHTML);
+        // 模版渲染后
+        // 可以开始操作dom
+      },
+
+      // 3.更新阶段(数据一变化会执行)
+      beforeUpdate() {
+        console.log('beforeUpdate 数据修改(还没有更新到视图里来，视图还没更新', document.querySelector('span').innerHTML);
+      },
+      updated() {
+        console.log('updated 数据修改，视图已更新', document.querySelector('span').innerHTML);
+      },
+
+      // 4.销毁阶段
+      beforeDestroy() {
+        console.log('beforeDestroy 销毁前');
+        // 清楚一些vue以外的资源占用，定时器之类的
+      },
+      destroyed() {
+        console.log('destroyed');
+      },
+    })
+  </script>
+</body>
+
+</html>
